@@ -3,7 +3,6 @@ using System.Collections;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.CustomMarshalers;
 
 namespace EvernoteSDK
 {
@@ -149,7 +148,7 @@ namespace EvernoteSDK
         int Count();
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime), DispId(3)]
         void Remove([In(), MarshalAs(UnmanagedType.Struct)] ref object Index);
-        [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "", MarshalTypeRef = typeof(EnumeratorToEnumVariantMarshaler), MarshalCookie = "")]
+        //[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "", MarshalTypeRef = typeof(EnumeratorToEnumVariantMarshaler), MarshalCookie = "")]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime), DispId(-4)]
         new IEnumerator GetEnumerator();
     }

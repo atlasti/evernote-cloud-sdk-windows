@@ -20,7 +20,7 @@ namespace EvernoteSDK
 		private const string ENSessionBootstrapServerBaseURLStringCN = "app.yinxiang.com";
 		private const string ENSessionBootstrapServerBaseURLStringUS = "www.evernote.com";
 
-		private const string ENSessionPreferencesFilename = "EvernoteSDKPrefs.bin";
+		private const string ENSessionPreferencesFilename = "EvernoteSDKPrefs.xml";
 		private const string ENSessionPreferencesCredentialStore = "CredentialStore";
 		private const string ENSessionPreferencesCurrentProfileName = "CurrentProfileName";
 		private const string ENSessionPreferencesUser = "User";
@@ -237,8 +237,8 @@ namespace EvernoteSDK
 		{
 			get
 			{
-                var linked = Preferences.ObjectForKey(ENSessionPreferencesAppNotebookIsLinked);
-                return (linked != null) ? (bool)linked : false;
+                bool? linked = Preferences.BoolForKey(ENSessionPreferencesAppNotebookIsLinked);
+                return linked ?? false;
 			}
 		}
 
@@ -384,7 +384,7 @@ namespace EvernoteSDK
 			// We appear to have valid personal credentials, so populate the user object from cache,
 			// and pull up business credentials. Refresh the business credentials if necessary, and the user
 			// object always.
-			EdamUser = (User)Preferences.ObjectForKey(ENSessionPreferencesUser);
+			EdamUser = Preferences.UserForKey(ENSessionPreferencesUser);
 
 			PerformPostAuthentication();
 		}
@@ -482,7 +482,7 @@ namespace EvernoteSDK
 					PrimaryAuthenticationToken = credentials.AuthenticationToken;
 					if (oauth.LinkedAppNotebookSelected)
 					{
-						Preferences.SetObject(oauth.LinkedAppNotebookSelected, ENSessionPreferencesAppNotebookIsLinked);
+						Preferences.SetBool(oauth.LinkedAppNotebookSelected, ENSessionPreferencesAppNotebookIsLinked);
 					}
 					AuthenticationCompleted = true;
 					PerformPostAuthentication();
@@ -512,7 +512,7 @@ namespace EvernoteSDK
 			if (edUser != null)
 			{
 				EdamUser = edUser;
-				Preferences.SetObject(EdamUser, ENSessionPreferencesUser);
+				Preferences.SetUser(EdamUser, ENSessionPreferencesUser);
 			}
 			else
 			{
@@ -704,7 +704,7 @@ namespace EvernoteSDK
 				context.SharedBusinessNotebookGuids = new List<string>();
 				foreach (SharedNotebook notebook in sharedNotebooks)
 				{
-					context.SharedBusinessNotebooks.Add(notebook.ShareKey, notebook);
+					context.SharedBusinessNotebooks.Add(notebook.GlobalId, notebook);
 					context.SharedBusinessNotebookGuids.Add(notebook.NotebookGuid);
 				}
 
@@ -750,9 +750,9 @@ namespace EvernoteSDK
 			foreach (LinkedNotebook linkedNotebook in linkedPersonalNotebooksCopy)
 			{
                 SharedNotebook sharedNotebook = null;
-                if (linkedNotebook.ShareKey != null)
+                if (linkedNotebook.SharedNotebookGlobalId != null)
                 {
-                    context.SharedBusinessNotebooks.TryGetValue(linkedNotebook.ShareKey, out sharedNotebook);
+                    context.SharedBusinessNotebooks.TryGetValue(linkedNotebook.SharedNotebookGlobalId, out sharedNotebook);
                     if (sharedNotebook != null)
                     {
                         // This linked notebook corresponds to a business notebook.
@@ -796,7 +796,7 @@ namespace EvernoteSDK
             foreach (LinkedNotebook linkedNotebook in linkedPersonalNotebooksCopy)
 			{
 				ENNoteStoreClient noteStore = NoteStoreForLinkedNotebook(linkedNotebook);
-				if (linkedNotebook.ShareKey == null)
+				if (linkedNotebook.SharedNotebookGlobalId == null)
 				{
 					// ShareKey is null means it's a public notebook.
 					try
@@ -992,7 +992,7 @@ namespace EvernoteSDK
 			if (AppNotebookIsLinked)
 			{
 				// Do we have a cached linked notebook record to use as a destination?
-				LinkedNotebook linkedNotebook = (LinkedNotebook)Preferences.ObjectForKey(ENSessionPreferencesLinkedAppNotebook);
+				LinkedNotebook linkedNotebook = Preferences.LinkedNotebookForKey(ENSessionPreferencesLinkedAppNotebook);
 				if (linkedNotebook != null)
 				{
 					context.NoteStore = NoteStoreForLinkedNotebook(linkedNotebook);
@@ -1001,7 +1001,7 @@ namespace EvernoteSDK
 
 					// Because we are using a linked app notebook, and authenticating to it with the shared auth model,
 					// we must provide a notebook guid in the note or face an error.
-					SharedNotebook sharedNotebook = (SharedNotebook)Preferences.ObjectForKey(ENSessionPreferencesSharedAppNotebook);
+					SharedNotebook sharedNotebook = Preferences.SharedNotebookForKey(ENSessionPreferencesSharedAppNotebook);
 					context.Note.NotebookGuid = sharedNotebook.NotebookGuid;
 				}
 				else
@@ -1118,12 +1118,12 @@ namespace EvernoteSDK
 				}
 				// Take this notebook, and cache it.
 				LinkedNotebook linkedNotebook = linkedNotebooks[0];
-				if (linkedNotebook.ShareKey == null)
+				if (linkedNotebook.SharedNotebookGlobalId == null)
 				{
 					// The notebook is a public notebook so it's read only. Fail the request with error.
 					throw new ENPermissionDeniedException();
 				}
-				Preferences.SetObject(linkedNotebook, ENSessionPreferencesLinkedAppNotebook);
+				Preferences.SetLinkedNotebook(linkedNotebook, ENSessionPreferencesLinkedAppNotebook);
 
 				// Go find the shared notebook that corresponds to this.
 				context = UploadNote_FindSharedAppNotebook(context);
@@ -1139,7 +1139,7 @@ namespace EvernoteSDK
 
 		private ENSessionUploadContext UploadNote_FindSharedAppNotebook(ENSessionUploadContext context)
 		{
-			LinkedNotebook linkedNotebook = (LinkedNotebook)Preferences.ObjectForKey(ENSessionPreferencesLinkedAppNotebook);
+			LinkedNotebook linkedNotebook = Preferences.LinkedNotebookForKey(ENSessionPreferencesLinkedAppNotebook);
 			ENNoteStoreClient linkedNoteStore = NoteStoreForLinkedNotebook(linkedNotebook);
 			try
 			{
@@ -1147,7 +1147,7 @@ namespace EvernoteSDK
 				if (sharedNotebook != null)
 				{
 					// Persist the shared notebook record.
-					Preferences.SetObject(sharedNotebook, ENSessionPreferencesSharedAppNotebook);
+					Preferences.SetSharedNotebook(sharedNotebook, ENSessionPreferencesSharedAppNotebook);
 					// Go back and redetermine the destination.
 					context = UploadNote_DetermineDestination(context);
 				}
@@ -1805,7 +1805,7 @@ namespace EvernoteSDK
 
         private ENCredentialStore CredentialStore()
         {
-            ENCredentialStore store = (ENCredentialStore)Preferences.ObjectForKey(ENSessionPreferencesCredentialStore);
+            ENCredentialStore store = Preferences.ENCredentialStoreForKey(ENSessionPreferencesCredentialStore);
             if (store == null)
             {
                 store = new ENCredentialStore();
@@ -1827,7 +1827,7 @@ namespace EvernoteSDK
 
 		private void SaveCredentialStore(ENCredentialStore credentialStore)
 		{
-			Preferences.SetObject(credentialStore, ENSessionPreferencesCredentialStore);
+			Preferences.SetENCredentialStore(credentialStore, ENSessionPreferencesCredentialStore);
 		}
 #endregion
 
@@ -2037,7 +2037,7 @@ namespace EvernoteSDK
 
 		private string CurrentProfileName()
 		{
-            var profile = Preferences.ObjectForKey(ENSessionPreferencesCurrentProfileName);
+            var profile = Preferences.StringForKey(ENSessionPreferencesCurrentProfileName);
             return (profile != null) ? profile.ToString() : "";
 		}
 
@@ -2052,7 +2052,7 @@ namespace EvernoteSDK
 			{
 				profileName = ENConstants.ENBootstrapProfileNameChina;
 			}
-			Preferences.SetObject(profileName, ENSessionPreferencesCurrentProfileName);
+			Preferences.SetString(profileName, ENSessionPreferencesCurrentProfileName);
 		}
 
 		private string UserStoreUrl()

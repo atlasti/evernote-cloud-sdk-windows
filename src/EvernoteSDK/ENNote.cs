@@ -18,7 +18,7 @@ namespace EvernoteSDK
 			}
 			set
 			{
-				_Title = value.EnScrubUsingRegex(Evernote.EDAM.Limits.Constants.EDAM_NOTE_TITLE_REGEX, Evernote.EDAM.Limits.Constants.EDAM_NOTE_TITLE_LEN_MIN, Evernote.EDAM.Limits.Constants.EDAM_NOTE_TITLE_LEN_MAX);
+				_Title = value.EnScrubUsingRegex(Evernote.EDAM.Limits.LimitsConstants.EDAM_NOTE_TITLE_REGEX, Evernote.EDAM.Limits.LimitsConstants.EDAM_NOTE_TITLE_LEN_MIN, Evernote.EDAM.Limits.LimitsConstants.EDAM_NOTE_TITLE_LEN_MAX);
 			}
 		}
 
@@ -47,7 +47,7 @@ namespace EvernoteSDK
 				List<string> tags = new List<string>();
 				foreach (string tagName in value)
 				{
-					var scrubbedTag = tagName.EnScrubUsingRegex(Evernote.EDAM.Limits.Constants.EDAM_TAG_NAME_REGEX, Evernote.EDAM.Limits.Constants.EDAM_TAG_NAME_LEN_MIN, Evernote.EDAM.Limits.Constants.EDAM_TAG_NAME_LEN_MAX);
+					var scrubbedTag = tagName.EnScrubUsingRegex(Evernote.EDAM.Limits.LimitsConstants.EDAM_TAG_NAME_REGEX, Evernote.EDAM.Limits.LimitsConstants.EDAM_TAG_NAME_LEN_MIN, Evernote.EDAM.Limits.LimitsConstants.EDAM_TAG_NAME_LEN_MAX);
 					if (scrubbedTag != null)
 					{
 						tags.Add(scrubbedTag);
@@ -132,7 +132,7 @@ namespace EvernoteSDK
 		{
 			if (resource != null)
 			{
-				if (Resources.Count >= Evernote.EDAM.Limits.Constants.EDAM_NOTE_RESOURCES_MAX)
+				if (Resources.Count >= Evernote.EDAM.Limits.LimitsConstants.EDAM_NOTE_RESOURCES_MAX)
 				{
 					ENSDKLogger.ENSDKLogInfo(string.Format("Too many resources already on note. Ignoring {0}. Note {1}.", resource, this));
 				}
@@ -327,16 +327,16 @@ namespace EvernoteSDK
 
 		internal bool ValidateForLimits()
 		{
-			if (EnmlContent().Length < Evernote.EDAM.Limits.Constants.EDAM_NOTE_CONTENT_LEN_MIN || EnmlContent().Length > Evernote.EDAM.Limits.Constants.EDAM_NOTE_CONTENT_LEN_MAX)
+			if (EnmlContent().Length < Evernote.EDAM.Limits.LimitsConstants.EDAM_NOTE_CONTENT_LEN_MIN || EnmlContent().Length > Evernote.EDAM.Limits.LimitsConstants.EDAM_NOTE_CONTENT_LEN_MAX)
 			{
 				ENSDKLogger.ENSDKLogInfo(string.Format("Note fails validation for content length: {0}", this));
 				return false;
 			}
 
-			var maxResourceSize = Evernote.EDAM.Limits.Constants.EDAM_RESOURCE_SIZE_MAX_FREE;
+			var maxResourceSize = Evernote.EDAM.Limits.LimitsConstants.EDAM_RESOURCE_SIZE_MAX_FREE;
 			if (ENSession.SharedSession.IsPremiumUser)
 			{
-				maxResourceSize = Evernote.EDAM.Limits.Constants.EDAM_RESOURCE_SIZE_MAX_PREMIUM;
+				maxResourceSize = Evernote.EDAM.Limits.LimitsConstants.EDAM_RESOURCE_SIZE_MAX_PREMIUM;
 			}
 
 			foreach (var rs in Resources)

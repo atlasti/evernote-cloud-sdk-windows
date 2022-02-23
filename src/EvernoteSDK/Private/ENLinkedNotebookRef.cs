@@ -22,7 +22,7 @@ namespace EvernoteSDK
 			linkedNotebookRef.Guid = linkedNotebook.Guid;
 			linkedNotebookRef.NoteStoreUrl = linkedNotebook.NoteStoreUrl;
 			linkedNotebookRef.ShardId = linkedNotebook.ShardId;
-			linkedNotebookRef.SharedNotebookGlobalId = linkedNotebook.ShareKey;
+			linkedNotebookRef.SharedNotebookGlobalId = linkedNotebook.SharedNotebookGlobalId;
 			return linkedNotebookRef;
 		}
 

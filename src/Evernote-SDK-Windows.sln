@@ -1,11 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvernoteSDK", "EvernoteSDK\EvernoteSDK.csproj", "{EFB2706A-EE60-4B33-ABD4-695B509F277B}"
-EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "EvernoteSDK_COMSetup", "EvernoteSDK_COMSetup\EvernoteSDK_COMSetup.vdproj", "{1AB456C0-75F7-4606-A6C3-258F088D6B07}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EvernoteSDK", "EvernoteSDK\EvernoteSDK.csproj", "{112F2427-7228-4E00-B736-6ED86255DC97}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Evernote OAuth", "Evernote OAuth", "{69BB72C7-971B-41B7-B093-ED1870ABCF5C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EvernoteOAuthNet", "Evernote OAuth\EvernoteOAuthNet\EvernoteOAuthNet\EvernoteOAuthNet.csproj", "{BE0AE2E3-C1E4-4AA8-9658-AB1BCE766C21}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthSample", "Evernote OAuth\AuthSample\AuthSample\AuthSample.csproj", "{A3D07F76-0310-4FAE-B882-35DD3A8AE765}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{507E1F00-B47C-4902-95AB-D9D2E6ABDD8C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleApp", "..\samples\CS\SampleApp\SampleApp\SampleApp.csproj", "{C41EAC7C-2C1F-4901-83A7-C0018416FCA9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,16 +23,36 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EFB2706A-EE60-4B33-ABD4-695B509F277B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EFB2706A-EE60-4B33-ABD4-695B509F277B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EFB2706A-EE60-4B33-ABD4-695B509F277B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EFB2706A-EE60-4B33-ABD4-695B509F277B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1AB456C0-75F7-4606-A6C3-258F088D6B07}.Debug|Any CPU.ActiveCfg = Debug
 		{1AB456C0-75F7-4606-A6C3-258F088D6B07}.Debug|Any CPU.Build.0 = Debug
 		{1AB456C0-75F7-4606-A6C3-258F088D6B07}.Release|Any CPU.ActiveCfg = Release
 		{1AB456C0-75F7-4606-A6C3-258F088D6B07}.Release|Any CPU.Build.0 = Release
+		{112F2427-7228-4E00-B736-6ED86255DC97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{112F2427-7228-4E00-B736-6ED86255DC97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{112F2427-7228-4E00-B736-6ED86255DC97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{112F2427-7228-4E00-B736-6ED86255DC97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE0AE2E3-C1E4-4AA8-9658-AB1BCE766C21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE0AE2E3-C1E4-4AA8-9658-AB1BCE766C21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE0AE2E3-C1E4-4AA8-9658-AB1BCE766C21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE0AE2E3-C1E4-4AA8-9658-AB1BCE766C21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3D07F76-0310-4FAE-B882-35DD3A8AE765}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3D07F76-0310-4FAE-B882-35DD3A8AE765}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3D07F76-0310-4FAE-B882-35DD3A8AE765}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3D07F76-0310-4FAE-B882-35DD3A8AE765}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C41EAC7C-2C1F-4901-83A7-C0018416FCA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C41EAC7C-2C1F-4901-83A7-C0018416FCA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C41EAC7C-2C1F-4901-83A7-C0018416FCA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C41EAC7C-2C1F-4901-83A7-C0018416FCA9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BE0AE2E3-C1E4-4AA8-9658-AB1BCE766C21} = {69BB72C7-971B-41B7-B093-ED1870ABCF5C}
+		{A3D07F76-0310-4FAE-B882-35DD3A8AE765} = {69BB72C7-971B-41B7-B093-ED1870ABCF5C}
+		{C41EAC7C-2C1F-4901-83A7-C0018416FCA9} = {507E1F00-B47C-4902-95AB-D9D2E6ABDD8C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {924C7637-1C7D-47EB-B10F-9D2C498121B4}
 	EndGlobalSection
 EndGlobal

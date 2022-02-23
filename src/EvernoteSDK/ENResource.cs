@@ -79,11 +79,11 @@ namespace EvernoteSDK
 
 			if (image.RawFormat.Equals(ImageFormat.Png))
 			{
-				MimeType = Evernote.EDAM.Limits.Constants.EDAM_MIME_TYPE_PNG;
+				MimeType = Evernote.EDAM.Limits.LimitsConstants.EDAM_MIME_TYPE_PNG;
 			}
 			else if (image.RawFormat.Equals(ImageFormat.Jpeg))
 			{
-				MimeType = Evernote.EDAM.Limits.Constants.EDAM_MIME_TYPE_JPEG;
+				MimeType = Evernote.EDAM.Limits.LimitsConstants.EDAM_MIME_TYPE_JPEG;
 				//ElseIf image.RawFormat.Equals(ImageFormat.Gif) Then
 				// TODO: Find out if it's OK to include the GIF format
 				//    Me.mimeType = Evernote.EDAM.Limits.Constants.EDAM_MIME_TYPE_GIF

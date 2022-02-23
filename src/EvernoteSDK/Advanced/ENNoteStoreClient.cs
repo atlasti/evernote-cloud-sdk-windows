@@ -34,7 +34,7 @@ namespace EvernoteSDK
 					if (_client == null)
 					{
 						Uri url = new Uri(NoteStoreUrl());
-						THttpClient transport = new THttpClient(url);
+						TTransport transport = new Thrift.Transport.Client.THttpTransport(url, null);
 						TBinaryProtocol protocol = new TBinaryProtocol(transport);
 						_client = new NoteStore.Client(protocol, protocol);
 					}
@@ -74,7 +74,7 @@ namespace EvernoteSDK
 			// */
 			public SyncState GetSyncState()
 			{
-				return Client.getSyncState(AuthenticationToken());
+				return AsyncHelper.GetResult(() => Client.getSyncState(AuthenticationToken()));
 			}
 
 			///** Asks the NoteStore to provide the state of the account in order of last modification.
@@ -83,9 +83,10 @@ namespace EvernoteSDK
 			// @param  maxEntries The maximum number of modified objects that should be returned in the result SyncChunk. This can be used to limit the size of each individual message to be friendly for network transfer. Applications should not request more than 256 objects at a time, and must handle the case where the service returns less than the requested number of objects in a given request even though more objects are available on the service.
 			// @param  fullSyncOnly If true, then the client only wants initial data for a full sync. In this case, the service will not return any expunged objects, and will not return any Resources, since these are also provided in their corresponding Notes.
 			// */
+			[Obsolete("Use GetFilteredSyncChunk.", true)]
 			public SyncChunk GetSyncChunk(int afterUSN, int maxEntries, bool fullSyncOnly)
 			{
-				return Client.getSyncChunk(AuthenticationToken(), afterUSN, maxEntries, fullSyncOnly);
+				throw new NotImplementedException();
 			}
 
 			///** Asks the NoteStore to provide the state of the account in order of last modification.
@@ -96,7 +97,7 @@ namespace EvernoteSDK
 			// */
 			public SyncChunk GetFilteredSyncChunk(int afterUSN, int maxEntries, SyncChunkFilter filter)
 			{
-				return Client.getFilteredSyncChunk(AuthenticationToken(), afterUSN, maxEntries, filter);
+				return AsyncHelper.GetResult(() => Client.getFilteredSyncChunk(AuthenticationToken(), afterUSN, maxEntries, filter));
 			}
 
 			///** Asks the NoteStore to provide information about the status of a linked notebook that has been shared with the caller, or that is public to the world.
@@ -106,7 +107,7 @@ namespace EvernoteSDK
 			// */
 			public SyncState GetLinkedNotebookSyncState(LinkedNotebook linkedNotebook)
 			{
-				return Client.getLinkedNotebookSyncState(AuthenticationToken(), linkedNotebook);
+				return AsyncHelper.GetResult(() => Client.getLinkedNotebookSyncState(AuthenticationToken(), linkedNotebook));
 			}
 
 			///** Asks the NoteStore to provide information about the contents of a linked notebook that has been shared with the caller, or that is public to the world.
@@ -130,7 +131,7 @@ namespace EvernoteSDK
 			// */
 			public List<Notebook> ListNotebooks()
 			{
-				return Client.listNotebooks(AuthenticationToken());
+				return AsyncHelper.GetResult(() => Client.listNotebooks(AuthenticationToken()));
 			}
 
 			///** Returns the current state of the notebook with the provided GUID. The notebook may be active or deleted (but not expunged).
@@ -138,14 +139,14 @@ namespace EvernoteSDK
 			// */
 			public Notebook GetNotebook(string guid)
 			{
-				return Client.getNotebook(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.getNotebook(AuthenticationToken(), guid));
 			}
 
 			///** Returns the notebook that should be used to store new notes in the user's account when no other notebooks are specified.
 			// */
 			public Notebook GetDefaultNotebook()
 			{
-				return Client.getDefaultNotebook(AuthenticationToken());
+				return AsyncHelper.GetResult(() => Client.getDefaultNotebook(AuthenticationToken()));
 			}
 
 			///** Asks the service to make a notebook with the provided name.
@@ -153,7 +154,7 @@ namespace EvernoteSDK
 			// */
 			public Notebook CreateNotebook(Notebook notebook)
 			{
-				return Client.createNotebook(AuthenticationToken(), notebook);
+				return AsyncHelper.GetResult(() => Client.createNotebook(AuthenticationToken(), notebook));
 			}
 
 			///** Submits notebook changes to the service. The provided data must include the notebook's guid field for identification.
@@ -161,7 +162,7 @@ namespace EvernoteSDK
 			// */
 			public int UpdateNotebook(Notebook notebook)
 			{
-				return Client.updateNotebook(AuthenticationToken(), notebook);
+				return AsyncHelper.GetResult(() => Client.updateNotebook(AuthenticationToken(), notebook));
 			}
 
 			///** Permanently removes the notebook from the user's account. After this action, the notebook is no longer available for undeletion, etc. If the notebook contains any Notes, they will be moved to the current default notebook and moved into the trash (i.e. Note.active=false).
@@ -169,7 +170,7 @@ namespace EvernoteSDK
 			// */
 			public int ExpungeNotebook(string guid)
 			{
-				return Client.expungeNotebook(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.expungeNotebook(AuthenticationToken(), guid));
 			}
 
 			/////---------------------------------------------------------------------------------------
@@ -181,12 +182,12 @@ namespace EvernoteSDK
             [ComVisible(false)]
             public List<Tag> ListTags()
 			{
-				return Client.listTags(AuthenticationToken());
+				return AsyncHelper.GetResult(() => Client.listTags(AuthenticationToken()));
 			}
 
             public ENCollection ListTagsForCOM()
             {
-                List<Tag> tags = Client.listTags(AuthenticationToken());
+                List<Tag> tags = AsyncHelper.GetResult(() => Client.listTags(AuthenticationToken()));
 
                 ENCollection comResults = new ENCollection();
                 foreach (Tag tag in tags)
@@ -208,7 +209,7 @@ namespace EvernoteSDK
 			// */
 			public List<Tag> ListTagsByNotebook(string guid)
 			{
-				return Client.listTagsByNotebook(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.listTagsByNotebook(AuthenticationToken(), guid));
 			}
 
 			///** Returns the current state of the Tag with the provided GUID.
@@ -216,7 +217,7 @@ namespace EvernoteSDK
 			// */
 			public Tag GetTag(string guid)
 			{
-				return Client.getTag(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.getTag(AuthenticationToken(), guid));
 			}
 
 			///** Asks the service to make a tag with a set of information.
@@ -224,7 +225,7 @@ namespace EvernoteSDK
 			// */
 			public Tag CreateTag(Tag tag)
 			{
-				return Client.createTag(AuthenticationToken(), tag);
+				return AsyncHelper.GetResult(() => Client.createTag(AuthenticationToken(), tag));
 			}
 
 			///** Submits tag changes to the service. The provided data must include the tag's guid field for identification. The service will apply updates to the following tag fields: name, parentGuid
@@ -232,7 +233,7 @@ namespace EvernoteSDK
 			// */
 			public int UpdateTag(Tag tag)
 			{
-				return Client.updateTag(AuthenticationToken(), tag);
+				return AsyncHelper.GetResult(() => Client.updateTag(AuthenticationToken(), tag));
 			}
 
 			///** Removes the provided tag from every note that is currently tagged with this tag. If this operation is successful, the tag will still be in the account, but it will not be tagged on any notes.
@@ -250,7 +251,7 @@ namespace EvernoteSDK
 			// */
 			public int ExpungeTag(string guid)
 			{
-				return Client.expungeTag(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.expungeTag(AuthenticationToken(), guid));
 			}
 
 			/////---------------------------------------------------------------------------------------
@@ -261,7 +262,7 @@ namespace EvernoteSDK
 			// */
 			public List<SavedSearch> ListSearches()
 			{
-				return Client.listSearches(AuthenticationToken());
+				return AsyncHelper.GetResult(() => Client.listSearches(AuthenticationToken()));
 			}
 
 			///** Returns the current state of the search with the provided GUID.
@@ -269,7 +270,7 @@ namespace EvernoteSDK
 			// */
 			public SavedSearch GetSearch(string guid)
 			{
-				return Client.getSearch(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.getSearch(AuthenticationToken(), guid));
 			}
 
 			///** Asks the service to make a saved search with a set of information.
@@ -277,7 +278,7 @@ namespace EvernoteSDK
 			// */
 			public SavedSearch CreateSearch(SavedSearch search)
 			{
-				return Client.createSearch(AuthenticationToken(), search);
+				return AsyncHelper.GetResult(() => Client.createSearch(AuthenticationToken(), search));
 			}
 
 			///** Submits search changes to the service. The provided data must include the search's guid field for identification. The service will apply updates to the following search fields: name, query, and format.
@@ -285,7 +286,7 @@ namespace EvernoteSDK
 			// */
 			public int UpdateSearch(SavedSearch search)
 			{
-				return Client.updateSearch(AuthenticationToken(), search);
+				return AsyncHelper.GetResult(() => Client.updateSearch(AuthenticationToken(), search));
 			}
 
 			///** Permanently deletes the saved search with the provided GUID, if present.
@@ -294,7 +295,7 @@ namespace EvernoteSDK
 			// */
 			public int ExpungeSearch(string guid)
 			{
-				return Client.expungeSearch(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.expungeSearch(AuthenticationToken(), guid));
 			}
 
 			/////---------------------------------------------------------------------------------------
@@ -308,7 +309,7 @@ namespace EvernoteSDK
 			// */
 			public RelatedResult FindRelated(RelatedQuery query, RelatedResultSpec resultSpec)
 			{
-				return Client.findRelated(AuthenticationToken(), query, resultSpec);
+				return AsyncHelper.GetResult(() => Client.findRelated(AuthenticationToken(), query, resultSpec));
 			}
 
 			///** Used to find a set of the notes from a user's account based on various criteria specified via a NoteFilter object.
@@ -317,9 +318,10 @@ namespace EvernoteSDK
 			// @param  offset The numeric index of the first note to show within the sorted results. The numbering scheme starts with "0". This can be used for pagination.
 			// @param  maxNotes The most notes to return in this query. The service will return a set of notes that is no larger than this number, but may return fewer notes if needed. The NoteList.totalNotes field in the return value will indicate whether there are more values available after the returned set.
 			// */
+			[Obsolete("Use findNotesMetadata.", true)]
 			public NoteList FindNotes(NoteFilter filter, int offset, int maxNotes)
 			{
-				return Client.findNotes(AuthenticationToken(), filter, offset, maxNotes);
+				throw new NotImplementedException();
 			}
 
 			///** Finds the position of a note within a sorted subset of all of the user's notes.
@@ -329,7 +331,7 @@ namespace EvernoteSDK
 			// */
 			public int FindNoteOffset(NoteFilter filter, string guid)
 			{
-				return Client.findNoteOffset(AuthenticationToken(), filter, guid);
+				return AsyncHelper.GetResult(() => Client.findNoteOffset(AuthenticationToken(), filter, guid));
 			}
 
 			///** Used to find the high-level information about a set of the notes from a user's account based on various criteria specified via a NoteFilter object.
@@ -341,7 +343,7 @@ namespace EvernoteSDK
 			// */
 			public NotesMetadataList FindNotesMetadata(NoteFilter filter, int offset, int maxNotes, NotesMetadataResultSpec resultSpec)
 			{
-				return Client.findNotesMetadata(AuthenticationToken(), filter, offset, maxNotes, resultSpec);
+				return AsyncHelper.GetResult(() => Client.findNotesMetadata(AuthenticationToken(), filter, offset, maxNotes, resultSpec));
 			}
 
 			///** This function is used to determine how many notes are found for each notebook and tag in the user's account, given a current set of filter parameters that determine the current selection.
@@ -351,7 +353,7 @@ namespace EvernoteSDK
 			// */
 			public NoteCollectionCounts FindNotesCount(NoteFilter filter, bool withTrash)
 			{
-				return Client.findNoteCounts(AuthenticationToken(), filter, withTrash);
+				return AsyncHelper.GetResult(() => Client.findNoteCounts(AuthenticationToken(), filter, withTrash));
 			}
 
 			///** Returns the current state of the note in the service with the provided GUID. The ENML contents of the note will only be provided if the 'withContent' parameter is true.
@@ -365,12 +367,12 @@ namespace EvernoteSDK
             [ComVisible(false)]
             public Note GetNote(string guid, bool withContent, bool withResourcesData, bool withResourcesRecognition, bool withResourcesAlternateData)
 			{
-				return Client.getNote(AuthenticationToken(), guid, withContent, withResourcesData, withResourcesRecognition, withResourcesAlternateData);
+				return AsyncHelper.GetResult(() => Client.getNote(AuthenticationToken(), guid, withContent, withResourcesData, withResourcesRecognition, withResourcesAlternateData));
 			}
 
             public EdamNote GetNoteForCOM(string guid, bool withContent, bool withResourcesData, bool withResourcesRecognition, bool withResourcesAlternateData)
             {
-                Note note = Client.getNote(AuthenticationToken(), guid, withContent, withResourcesData, withResourcesRecognition, withResourcesAlternateData);
+                Note note = AsyncHelper.GetResult(() => Client.getNote(AuthenticationToken(), guid, withContent, withResourcesData, withResourcesRecognition, withResourcesAlternateData));
                 EdamNote edamNote = new EdamNote();
                 edamNote.Guid = note.Guid;
                 edamNote.Title = note.Title;
@@ -396,7 +398,7 @@ namespace EvernoteSDK
 			// */
 			public LazyMap GetNoteApplicationData(string guid)
 			{
-				return Client.getNoteApplicationData(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.getNoteApplicationData(AuthenticationToken(), guid));
 			}
 
 			///** Get the value of a single entry in the applicationData map for the note identified by GUID.
@@ -405,7 +407,7 @@ namespace EvernoteSDK
 			// */
 			public string GetNoteApplicationDataEntry(string guid, string key)
 			{
-				return Client.getNoteApplicationDataEntry(AuthenticationToken(), guid, key);
+				return AsyncHelper.GetResult(() => Client.getNoteApplicationDataEntry(AuthenticationToken(), guid, key));
 			}
 
 			///** Update, or create, an entry in the applicationData map for the note identified by guid.
@@ -415,7 +417,7 @@ namespace EvernoteSDK
 			// */
 			public int SetNoteApplicationDataEntry(string guid, string key, string value)
 			{
-				return Client.setNoteApplicationDataEntry(AuthenticationToken(), guid, key, value);
+				return AsyncHelper.GetResult(() => Client.setNoteApplicationDataEntry(AuthenticationToken(), guid, key, value));
 			}
 
 			///** Remove an entry identified by 'key' from the applicationData map for the note identified by 'guid'. Silently ignores an unset of a non-existing key.
@@ -424,7 +426,7 @@ namespace EvernoteSDK
 			// */
 			public int UnsetNoteApplicationDataEntry(string guid, string key)
 			{
-				return Client.unsetNoteApplicationDataEntry(AuthenticationToken(), guid, key);
+				return AsyncHelper.GetResult(() => Client.unsetNoteApplicationDataEntry(AuthenticationToken(), guid, key));
 			}
 
 			///** Returns XHTML contents of the note with the provided GUID. If the Note is found in a public notebook, the authenticationToken will be ignored (so it could be an empty string).
@@ -435,7 +437,7 @@ namespace EvernoteSDK
 			// */
 			public string GetNoteContent(string guid)
 			{
-				return Client.getNoteContent(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.getNoteContent(AuthenticationToken(), guid));
 			}
 
 			///** Returns a block of the extracted plain text contents of the note with the provided GUID.
@@ -447,7 +449,7 @@ namespace EvernoteSDK
 			// */
 			public string GetNoteSearchText(string guid, bool noteOnly, bool tokenizeForIndexing)
 			{
-				return Client.getNoteSearchText(AuthenticationToken(), guid, noteOnly, tokenizeForIndexing);
+				return AsyncHelper.GetResult(() => Client.getNoteSearchText(AuthenticationToken(), guid, noteOnly, tokenizeForIndexing));
 			}
 
 			///** Returns a block of the extracted plain text contents of the resource with the provided GUID.
@@ -456,7 +458,7 @@ namespace EvernoteSDK
 			// */
 			public string GetResourceSearchText(string guid)
 			{
-				return Client.getResourceSearchText(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.getResourceSearchText(AuthenticationToken(), guid));
 			}
 
 			///** Returns a list of the names of the tags for the note with the provided guid.
@@ -465,7 +467,7 @@ namespace EvernoteSDK
 			// */
 			public List<string> GetNoteTagNames(string guid)
 			{
-				return Client.getNoteTagNames(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.getNoteTagNames(AuthenticationToken(), guid));
 			}
 
 			///** Asks the service to make a note with the provided set of information.
@@ -475,7 +477,7 @@ namespace EvernoteSDK
 			// */
 			public Note CreateNote(Note note)
 			{
-				return Client.createNote(AuthenticationToken(), note);
+				return AsyncHelper.GetResult(() => Client.createNote(AuthenticationToken(), note));
 			}
 
 			///** Submit a set of changes to a note to the service.
@@ -484,7 +486,7 @@ namespace EvernoteSDK
 			// */
 			public Note UpdateNote(Note note)
 			{
-				return Client.updateNote(AuthenticationToken(), note);
+				return AsyncHelper.GetResult(() => Client.updateNote(AuthenticationToken(), note));
 			}
 
 			///** Moves the note into the trash. The note may still be undeleted, unless it is expunged.
@@ -493,7 +495,7 @@ namespace EvernoteSDK
 			// */
 			public int DeleteNote(string guid)
 			{
-				return Client.deleteNote(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.deleteNote(AuthenticationToken(), guid));
 			}
 
 			///** Permanently removes a Note, and all of its Resources, from the service.
@@ -502,7 +504,7 @@ namespace EvernoteSDK
 			// */
 			public int ExpungeNote(string guid)
 			{
-				return Client.expungeNote(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.expungeNote(AuthenticationToken(), guid));
 			}
 
 			///** Permanently removes a list of Notes, and all of their Resources, from the service.
@@ -510,18 +512,20 @@ namespace EvernoteSDK
 			// NOTE: This function is not available to third party applications. Calls will result in an EDAMUserException with the error code PERMISSION_DENIED.
 			// @param  guids The list of GUIDs for the Notes to remove.
 			// */
+			[Obsolete("This function is not available to third party applications. Calls will result in an EDAMUserException with the error code PERMISSION_DENIED.", true)]
 			public int ExpungeNotes(List<string> guids)
 			{
-				return Client.expungeNotes(AuthenticationToken(), guids);
+				throw new NotImplementedException();
 			}
 
 			///** Permanently removes all of the Notes that are currently marked as inactive.
 			// This is equivalent to "emptying the trash", and these Notes will be gone permanently. This operation may be relatively slow if the account contains a large number of inactive Notes.
 			// NOTE: This function is not available to third party applications. Calls will result in an EDAMUserException with the error code PERMISSION_DENIED.
 			// */
+			[Obsolete("This function is not available to third party applications. Calls will result in an EDAMUserException with the error code PERMISSION_DENIED.", true)]
 			public int ExpungeInactiveNotes()
 			{
-				return Client.expungeInactiveNotes(AuthenticationToken());
+				throw new NotImplementedException();
 			}
 
 			///** Performs a deep copy of the Note with the provided GUID 'noteGuid' into the Notebook with the provided GUID 'toNotebookGuid'.
@@ -531,7 +535,7 @@ namespace EvernoteSDK
 			// */
 			public Note CopyNote(string guid, string toNotebookGuid)
 			{
-				return Client.copyNote(AuthenticationToken(), guid, toNotebookGuid);
+				return AsyncHelper.GetResult(() => Client.copyNote(AuthenticationToken(), guid, toNotebookGuid));
 			}
 
 			///** Returns a list of the prior versions of a particular note that are saved within the service.
@@ -540,7 +544,7 @@ namespace EvernoteSDK
 			// */
 			public List<NoteVersionId> ListNoteVersions(string guid)
 			{
-				return Client.listNoteVersions(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.listNoteVersions(AuthenticationToken(), guid));
 			}
 
 			///** This can be used to retrieve a previous version of a Note after it has been updated within the service.
@@ -553,7 +557,7 @@ namespace EvernoteSDK
 			// */
 			public Note GetNoteVersion(string guid, int updateSequenceNum, bool withResourcesData, bool withResourcesRecognition, bool withResourcesAlternateData)
 			{
-				return Client.getNoteVersion(AuthenticationToken(), guid, updateSequenceNum, withResourcesData, withResourcesRecognition, withResourcesAlternateData);
+				return AsyncHelper.GetResult(() => Client.getNoteVersion(AuthenticationToken(), guid, updateSequenceNum, withResourcesData, withResourcesRecognition, withResourcesAlternateData));
 			}
 
 			/////---------------------------------------------------------------------------------------
@@ -570,7 +574,7 @@ namespace EvernoteSDK
 			// */
 			public Resource GetResource(string guid, bool withData, bool withRecognition, bool withAttributes, bool withAlternateData)
 			{
-				return Client.getResource(AuthenticationToken(), guid, withData, withRecognition, withAttributes, withAlternateData);
+				return AsyncHelper.GetResult(() => Client.getResource(AuthenticationToken(), guid, withData, withRecognition, withAttributes, withAlternateData));
 			}
 
 			///** Get all of the application data for the Resource identified by GUID, with values returned within the LazyMap fullMap field. If there are no applicationData entries, then a LazyMap with an empty fullMap will be returned. If your application only needs to fetch its own applicationData entry, use getResourceApplicationDataEntry instead.
@@ -578,7 +582,7 @@ namespace EvernoteSDK
 			// */
 			public LazyMap GetResourceApplicationData(string guid)
 			{
-				return Client.getResourceApplicationData(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.getResourceApplicationData(AuthenticationToken(), guid));
 			}
 
 			///** Get the value of a single entry in the applicationData map for the Resource identified by GUID.
@@ -587,7 +591,7 @@ namespace EvernoteSDK
 			// */
 			public string GetResourceApplicationDataEntry(string guid, string key)
 			{
-				return Client.getResourceApplicationDataEntry(AuthenticationToken(), guid, key);
+				return AsyncHelper.GetResult(() => Client.getResourceApplicationDataEntry(AuthenticationToken(), guid, key));
 			}
 
 			///** Update, or create, an entry in the applicationData map for the Resource identified by guid.
@@ -597,7 +601,7 @@ namespace EvernoteSDK
 			// */
 			public int SetResourceApplicationDataEntry(string guid, string key, string value)
 			{
-				return Client.setResourceApplicationDataEntry(AuthenticationToken(), guid, key, value);
+				return AsyncHelper.GetResult(() => Client.setResourceApplicationDataEntry(AuthenticationToken(), guid, key, value));
 			}
 
 			///** Remove an entry identified by 'key' from the applicationData map for the Resource identified by 'guid'.
@@ -610,7 +614,7 @@ namespace EvernoteSDK
 			//                                          failure:(void(^)(NSError *error))failure;
 			public int UnsetResourceApplicationDataEntry(string guid, string key)
 			{
-				return Client.unsetResourceApplicationDataEntry(AuthenticationToken(), guid, key);
+				return AsyncHelper.GetResult(() => Client.unsetResourceApplicationDataEntry(AuthenticationToken(), guid, key));
 			}
 
 			///** Submit a set of changes to a resource to the service.
@@ -619,7 +623,7 @@ namespace EvernoteSDK
 			// */
 			public int UpdateResource(Resource resource)
 			{
-				return Client.updateResource(AuthenticationToken(), resource);
+				return AsyncHelper.GetResult(() => Client.updateResource(AuthenticationToken(), resource));
 			}
 
 			///** Returns binary data of the resource with the provided GUID.
@@ -628,7 +632,7 @@ namespace EvernoteSDK
 			// */
 			public byte[] GetResourceData(string guid)
 			{
-				return Client.getResourceData(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.getResourceData(AuthenticationToken(), guid));
 			}
 
 			///** Returns the current state of a resource, referenced by containing note GUID and resource content hash.
@@ -640,7 +644,7 @@ namespace EvernoteSDK
 			// */
 			public Resource GetResourceByHash(string guid, byte[] contentHash, bool withData, bool withRecognition, bool withAlternateData)
 			{
-				return Client.getResourceByHash(AuthenticationToken(), guid, contentHash, withData, withRecognition, withAlternateData);
+				return AsyncHelper.GetResult(() => Client.getResourceByHash(AuthenticationToken(), guid, contentHash, withData, withRecognition, withAlternateData));
 			}
 
 			///** Returns the binary contents of the recognition index for the resource with the provided GUID.
@@ -649,7 +653,7 @@ namespace EvernoteSDK
 			// */
 			public byte[] GetResourceRecognition(string guid)
 			{
-				return Client.getResourceRecognition(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.getResourceRecognition(AuthenticationToken(), guid));
 			}
 
 			///** If the Resource with the provided GUID has an alternate data representation (indicated via the Resource.alternateData field), then this request can be used to retrieve the binary contents of that alternate data file. If the caller asks about a resource that has no alternate data form, this will throw EDAMNotFoundException.
@@ -657,7 +661,7 @@ namespace EvernoteSDK
 			// */
 			public byte[] GetResourceAlternateData(string guid)
 			{
-				return Client.getResourceAlternateData(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.getResourceAlternateData(AuthenticationToken(), guid));
 			}
 
 			///** Returns the set of attributes for the Resource with the provided GUID. If the Resource is found in a public notebook, the authenticationToken will be ignored (so it could be an empty string).
@@ -665,7 +669,7 @@ namespace EvernoteSDK
 			// */
 			public ResourceAttributes GetResourceAttributes(string guid)
 			{
-				return Client.getResourceAttributes(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.getResourceAttributes(AuthenticationToken(), guid));
 			}
 
 
@@ -680,15 +684,17 @@ namespace EvernoteSDK
 			// */
 			public Notebook GetPublicNotebook(int userID, string publicUri)
 			{
-				return Client.getPublicNotebook(userID, publicUri);
+				return AsyncHelper.GetResult(() => Client.getPublicNotebook(userID, publicUri));
 			}
 
 			///** Used to construct a shared notebook object. The constructed notebook will contain a "share key" which serve as a unique identifer and access token for a user to access the notebook of the shared notebook owner.
 			// @param  sharedNotebook An shared notebook object populated with the email address of the share recipient, the notebook guid and the access permissions. All other attributes of the shared object are ignored.
 			// */
+			[Obsolete(null, true)]
 			public SharedNotebook CreateSharedNotebook(SharedNotebook sharedNotebook)
 			{
-				return Client.createSharedNotebook(AuthenticationToken(), sharedNotebook);
+				throw new NotImplementedException();
+				// return Client.createSharedNotebook(AuthenticationToken(), sharedNotebook));
 			}
 
 			///** Send a reminder message to some or all of the email addresses that a notebook has been shared with.
@@ -697,25 +703,29 @@ namespace EvernoteSDK
 			// @param  messageText User provided text to include in the email
 			// @param  recipients The email addresses of the recipients. If this list is empty then all of the users that the notebook has been shared with are emailed. If an email address doesn't correspond to share invite members then that address is ignored.
 			// */
+			[Obsolete(null, true)]
 			public int SendMessageToSharedNotebookMembers(string guid, string messageText, List<string> recipients)
 			{
-				return Client.sendMessageToSharedNotebookMembers(AuthenticationToken(), guid, messageText, recipients);
+				throw new NotImplementedException();
+				// return Client.sendMessageToSharedNotebookMembers(AuthenticationToken(), guid, messageText, recipients));
 			}
 
 			///** Lists the collection of shared notebooks for all notebooks in the users account.
 			// */
 			public List<SharedNotebook> ListSharedNotebooks()
 			{
-				return Client.listSharedNotebooks(AuthenticationToken());
+				return AsyncHelper.GetResult(() => Client.listSharedNotebooks(AuthenticationToken()));
 			}
 
 			///** Expunges the SharedNotebooks in the user's account using the SharedNotebook.id as the identifier.
 			// NOTE: This function is not available to third party applications. Calls will result in an EDAMUserException with the error code PERMISSION_DENIED.
 			// @param sharedNotebookIds a list of SharedNotebook.id longs identifying the objects to delete permanently.
 			// */
+			[Obsolete(null, true)]
 			public int ExpungeSharedNotebooks(List<long> sharedNotebookIds)
 			{
-				return Client.expungeSharedNotebooks(AuthenticationToken(), sharedNotebookIds);
+				throw new NotImplementedException(); 
+				// return Client.expungeSharedNotebooks(AuthenticationToken(), sharedNotebookIds));
 			}
 
 			///** Asks the service to make a linked notebook with the provided name, username of the owner and identifiers provided.
@@ -724,7 +734,7 @@ namespace EvernoteSDK
 			// */
 			public LinkedNotebook CreateLinkedNotebook(LinkedNotebook linkedNotebook)
 			{
-				return Client.createLinkedNotebook(AuthenticationToken(), linkedNotebook);
+				return AsyncHelper.GetResult(() => Client.createLinkedNotebook(AuthenticationToken(), linkedNotebook));
 			}
 
 			///** Asks the service to update a linked notebook.
@@ -732,14 +742,14 @@ namespace EvernoteSDK
 			// */
 			public int UpdateLinkedNotebook(LinkedNotebook linkedNotebook)
 			{
-				return Client.updateLinkedNotebook(AuthenticationToken(), linkedNotebook);
+				return AsyncHelper.GetResult(() => Client.updateLinkedNotebook(AuthenticationToken(), linkedNotebook));
 			}
 
 			///** Returns a list of linked notebooks
 			// */
 			public List<LinkedNotebook> ListLinkedNotebooks()
 			{
-				return Client.listLinkedNotebooks(AuthenticationToken());
+				return AsyncHelper.GetResult(() => Client.listLinkedNotebooks(AuthenticationToken()));
 			}
 
 			///** Permanently expunges the linked notebook from the account.
@@ -748,7 +758,7 @@ namespace EvernoteSDK
 			// */
 			public int ExpungeLinkedNotebook(string guid)
 			{
-				return Client.expungeLinkedNotebook(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.expungeLinkedNotebook(AuthenticationToken(), guid));
 			}
 
 			///** Asks the service to produce an authentication token that can be used to access the contents of a shared notebook from someone else's account.
@@ -757,7 +767,7 @@ namespace EvernoteSDK
 			// */
 			public AuthenticationResult AuthenticateToSharedNotebook(string shareKeyOrGlobalId)
 			{
-				return Client.authenticateToSharedNotebook(shareKeyOrGlobalId, AuthenticationToken());
+				return AsyncHelper.GetResult(() => Client.authenticateToSharedNotebook(shareKeyOrGlobalId, AuthenticationToken()));
 			}
 
 			///** This function is used to retrieve extended information about a shared notebook by a guest who has already authenticated to access that notebook.
@@ -765,7 +775,7 @@ namespace EvernoteSDK
 			// */
 			public SharedNotebook GetSharedNotebookByAuth()
 			{
-				return Client.getSharedNotebookByAuth(AuthenticationToken());
+				return AsyncHelper.GetResult(() => Client.getSharedNotebookByAuth(AuthenticationToken()));
 			}
 
 			///** Attempts to send a single note to one or more email recipients.
@@ -782,7 +792,7 @@ namespace EvernoteSDK
 			// */
 			public string ShareNote(string guid)
 			{
-				return Client.shareNote(AuthenticationToken(), guid);
+				return AsyncHelper.GetResult(() => Client.shareNote(AuthenticationToken(), guid));
 			}
 
 			///** If this note is not already shared then this will stop sharing that note and invalidate its "Note Key", so any existing URLs to access that Note will stop working. If the Note is not shared, then this function will do nothing.
@@ -801,7 +811,7 @@ namespace EvernoteSDK
 			// */
 			public AuthenticationResult AuthenticateToSharedNote(string guid, string noteKey)
 			{
-				return Client.authenticateToSharedNote(guid, noteKey, AuthenticationToken());
+				return AsyncHelper.GetResult(() => Client.authenticateToSharedNote(guid, noteKey, AuthenticationToken()));
 			}
 
 			///** Update a SharedNotebook object.
@@ -809,16 +819,18 @@ namespace EvernoteSDK
 			// */
 			public int UpdateSharedNotebook(SharedNotebook sharedNotebook)
 			{
-				return Client.updateSharedNotebook(AuthenticationToken(), sharedNotebook);
+				return AsyncHelper.GetResult(() => Client.updateSharedNotebook(AuthenticationToken(), sharedNotebook));
 			}
 
 			///** Set shared notebook recipient settings.
 			// @param sharedNotebookId The shared notebooks id
 			// @param recipientSettings The settings of the recipient
 			// */
+			[Obsolete(null, true)]
 			public int SetSharedNotebookRecipientSettings(long sharedNotebookId, SharedNotebookRecipientSettings recipientSettings)
 			{
-				return Client.setSharedNotebookRecipientSettings(AuthenticationToken(), sharedNotebookId, recipientSettings);
+				throw new NotImplementedException();
+				// return Client.setSharedNotebookRecipientSettings(AuthenticationToken(), sharedNotebookId, recipientSettings));
 			}
 
 #region Protected routines

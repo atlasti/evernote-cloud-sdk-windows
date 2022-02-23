@@ -155,7 +155,7 @@ namespace EvernoteSDK
 		{
 			get
 			{
-				return IsLinked && string.IsNullOrEmpty(LinkedNotebook.ShareKey);
+				return IsLinked && string.IsNullOrEmpty(LinkedNotebook.SharedNotebookGlobalId);
 			}
 		}
 
@@ -174,7 +174,7 @@ namespace EvernoteSDK
 				// Business notebooks are the only ones that have a combination of a linked notebook and normal
 				// notebook being set. In this case, the normal notebook represents the notebook inside the business.
 				// Additionally, checking linked notebook record is actually pointing to a shared notebook record so it's not a public notebook.
-				return Notebook != null && LinkedNotebook != null && LinkedNotebook.ShareKey != null;
+				return Notebook != null && LinkedNotebook != null && LinkedNotebook.SharedNotebookGlobalId != null;
 			}
 		}
 

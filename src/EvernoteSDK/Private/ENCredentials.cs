@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
+using System.Xml;
+
 using Evernote.EDAM.UserStore;
 using EvernoteSDK.Advanced;
 
@@ -98,6 +100,41 @@ namespace EvernoteSDK
 			}
 
 			return true;
+		}
+
+		internal void Save(XmlWriter writer)
+		{
+			writer.WriteStartElement("EdamUserId");
+			if (this.EdamUserId == null)
+				writer.WriteAttributeString("null", "true");
+			else
+				writer.WriteString(this.EdamUserId);
+			writer.WriteEndElement();
+
+			writer.WriteStartElement("ExpirationDate");
+			writer.WriteString(XmlConvert.ToString(this.ExpirationDate, XmlDateTimeSerializationMode.RoundtripKind));
+			writer.WriteEndElement();
+
+			writer.WriteStartElement("Host");
+			if (this.Host == null)
+				writer.WriteAttributeString("null", "true");
+			else
+				writer.WriteString(this.Host);
+			writer.WriteEndElement();
+
+			writer.WriteStartElement("NoteStoreUrl");
+			if (this.NoteStoreUrl == null)
+				writer.WriteAttributeString("null", "true");
+			else
+				writer.WriteString(this.NoteStoreUrl);
+			writer.WriteEndElement();
+
+			writer.WriteStartElement("WebApiUrlPrefix");
+			if (this.WebApiUrlPrefix == null)
+				writer.WriteAttributeString("null", "true");
+			else
+				writer.WriteString(this.WebApiUrlPrefix);
+			writer.WriteEndElement();
 		}
 
 	}

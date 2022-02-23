@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml;
 
 namespace EvernoteSDK
 {
@@ -67,6 +69,27 @@ namespace EvernoteSDK
 			}
 
 			Store.Clear();
+		}
+
+		internal void Save(XmlWriter writer)
+        {
+			foreach (KeyValuePair<string, ENCredentials> pair in this.Store)
+			{
+				writer.WriteStartElement(pair.Key);
+				if (pair.Value == null)
+					writer.WriteAttributeString("null", "true");
+				else
+					pair.Value.Save(writer);
+				writer.WriteEndElement();
+			}
+		}
+
+		internal void Load(XmlElement element)
+		{
+			foreach (XmlElement item in element.ChildNodes.OfType<XmlElement>())
+			{
+				Store.Add(item.Name, item.LoadENCredentials());
+			}
 		}
 
 	}

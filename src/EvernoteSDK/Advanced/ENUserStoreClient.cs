@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+
 using Evernote.EDAM.Type;
 using Evernote.EDAM.UserStore;
 using Thrift.Protocol;
@@ -19,7 +21,7 @@ namespace EvernoteSDK
 			{
 				Uri url = new Uri(userStoreUrl);
 
-				TTransport transport = new THttpClient(url);
+				TTransport transport = new Thrift.Transport.Client.THttpTransport(url, null);
 				TProtocol protocol = new TBinaryProtocol(transport);
 				Client = new UserStore.Client(protocol);
 				AuthenticationToken = authToken;
@@ -38,7 +40,7 @@ namespace EvernoteSDK
 			//           
 			public bool CheckVersion(string clientName, int edamVersionMajor, int edamVersionMinor)
 			{
-				return Client.checkVersion(clientName, Convert.ToInt16(edamVersionMajor), Convert.ToInt16(edamVersionMinor));
+				return AsyncHelper.GetResult(() => Client.checkVersion(clientName, Convert.ToInt16(edamVersionMajor), Convert.ToInt16(edamVersionMinor)));
 			}
 
 			//* This provides bootstrap information to the client.
@@ -49,7 +51,7 @@ namespace EvernoteSDK
 			//           
 			public BootstrapInfo GetBootstrapInfo(string locale)
 			{
-				return Client.getBootstrapInfo(locale);
+				return AsyncHelper.GetResult(() => Client.getBootstrapInfo(locale));
 			}
 
 			//* Returns the User corresponding to the provided authentication token, or throws an exception if this token is not valid.
@@ -58,7 +60,7 @@ namespace EvernoteSDK
 			//        
 			public User GetUser()
 			{
-				return Client.getUser(AuthenticationToken);
+				return AsyncHelper.GetResult(() => Client.getUser(AuthenticationToken));
 			}
 
 			//* Asks the UserStore about the publicly available location information for a particular username.
@@ -67,14 +69,15 @@ namespace EvernoteSDK
 			//           
 			public PublicUserInfo GetPublicUserInfo(string username)
 			{
-				return Client.getPublicUserInfo(username);
+				return AsyncHelper.GetResult(() => Client.getPublicUserInfo(username));
 			}
 
 			//* Returns information regarding a user's Premium account corresponding to the provided authentication token, or throws an exception if this token is not valid.
 			//        
-			public PremiumInfo GetPremiumInfo()
+			[Obsolete("NOTE: This function is generally not available to third party applications. Calls will result in an EDAMUserException with the error code PERMISSION_DENIED.", true)]
+			public object GetPremiumInfo()
 			{
-				return Client.getPremiumInfo(AuthenticationToken);
+				throw new NotImplementedException();
 			}
 
 			//* Returns the URL that should be used to talk to the NoteStore for the account represented by the provided authenticationToken.
@@ -83,7 +86,7 @@ namespace EvernoteSDK
 			//        
 			public string GetNoteStoreUrl()
 			{
-				return Client.getNoteStoreUrl(AuthenticationToken);
+				return AsyncHelper.GetResult(() => Client.getUserUrls(AuthenticationToken))?.NoteStoreUrl;
 			}
 
 			//* This is used to take an existing authentication token that grants access to an individual user account (returned from 'authenticate', 'authenticateLongSession' or an OAuth authorization) and obtain an additional authentication token that may be used to access business notebooks if the user is a member of an Evernote Business account.
@@ -92,7 +95,7 @@ namespace EvernoteSDK
 			//        
 			public AuthenticationResult AuthenticateToBusiness()
 			{
-				return Client.authenticateToBusiness(AuthenticationToken);
+				return AsyncHelper.GetResult(() => Client.authenticateToBusiness(AuthenticationToken));
 			}
 
 			//* Revoke an existing long lived authentication token. This can be used to revoke OAuth tokens or tokens created by calling authenticateLongSession, and allows a user to effectively log out of Evernote from the perspective of the application that holds the token. The authentication token that is passed is immediately revoked and may not be used to call any authenticated EDAM function.

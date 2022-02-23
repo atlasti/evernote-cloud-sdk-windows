@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Evernote.EDAM.Type;
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Xml;
 
 namespace EvernoteSDK
 {
@@ -32,27 +35,86 @@ namespace EvernoteSDK
 				Load();
 			}
 
-			public object ObjectForKey(string key)
+            private T ObjectForKey<T>(string key)
+            {
+                object value = null;
+                Store.TryGetValue(key, out value);
+                return (T)value;
+            }
+
+            private void SetObject(object objectToStore, string key)
+            {
+                if (objectToStore != null)
+                {
+                    Store[key] = objectToStore;
+                }
+                else
+                {
+                    Store.Remove(key);
+                }
+                Save();
+            }
+
+            public bool? BoolForKey(string key)
 			{
-				object value = null;
-				Store.TryGetValue(key, out value);
-				return value;
+				return ObjectForKey<bool?>(key);
 			}
 
-			public void SetObject(object objectToStore, string key)
+			public void SetBool(bool? objectToStore, string key)
 			{
-				if (objectToStore != null)
-				{
-					Store[key] = objectToStore;
-				}
-				else
-				{
-					Store.Remove(key);
-				}
-				Save();
+				SetObject(objectToStore, key);
 			}
 
-            private void Save()
+			public string StringForKey(string key)
+			{
+				return ObjectForKey<string>(key);
+			}
+
+			public void SetString(string objectToStore, string key)
+			{
+				SetObject(objectToStore, key);
+			}
+
+			public User UserForKey(string key)
+            {
+				return ObjectForKey<User>(key);
+			}
+
+			public void SetUser(User objectToStore, string key)
+            {
+				SetObject(objectToStore, key);
+			}
+
+			public LinkedNotebook LinkedNotebookForKey(string key)
+			{
+				return ObjectForKey<LinkedNotebook>(key); ;
+			}
+
+			public void SetLinkedNotebook(LinkedNotebook objectToStore, string key)
+			{
+				SetObject(objectToStore, key);
+			}
+
+			public SharedNotebook SharedNotebookForKey(string key)
+			{
+				return ObjectForKey<SharedNotebook>(key); ;
+			}
+
+			public void SetSharedNotebook(SharedNotebook objectToStore, string key)
+			{
+				SetObject(objectToStore, key);
+			}
+			public ENCredentialStore ENCredentialStoreForKey(string key)
+			{
+				return ObjectForKey<ENCredentialStore>(key);
+			}
+
+			public void SetENCredentialStore(ENCredentialStore objectToStore, string key)
+			{
+				SetObject(objectToStore, key);
+			}
+
+			private void Save()
             {
                 string dir = Path.GetDirectoryName(Pathname);
                 if (!(Directory.Exists(dir)))
@@ -60,10 +122,7 @@ namespace EvernoteSDK
                     Directory.CreateDirectory(dir);
                 }
 
-                FileStream stream = new FileStream(Pathname, FileMode.OpenOrCreate);
-                System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                formatter.Serialize(stream, Store);
-                stream.Close();
+				ENPreferencesStoreXmlStorage.Save(Pathname, Store);
             }
 
 			public void RemoveAllObjects()
@@ -80,11 +139,8 @@ namespace EvernoteSDK
 
                 if (File.Exists(Pathname))
                 {
-                    FileStream stream = new FileStream(Pathname, FileMode.Open);
-                    System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    Store = (Dictionary<string, object>)formatter.Deserialize(stream);
-                    stream.Close();
-                }
+					Store = ENPreferencesStoreXmlStorage.Load(Pathname);
+				}
             }
 
             private Assembly MyResolveEventHandler(object sender, ResolveEventArgs args)

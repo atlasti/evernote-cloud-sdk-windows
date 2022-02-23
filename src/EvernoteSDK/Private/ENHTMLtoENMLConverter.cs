@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Sgml;
+
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -6,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Xsl;
-using Sgml;
 
 namespace EvernoteSDK
 {
@@ -84,7 +85,7 @@ namespace EvernoteSDK
 			}
 			else
 			{
-				transform.Load(typeof(HTML2ENML));
+				transform.Load(XmlReader.Create(new StringReader(Private.Resources.en_html2enml)));
 			}
 			transform.Transform(document, writer);
 

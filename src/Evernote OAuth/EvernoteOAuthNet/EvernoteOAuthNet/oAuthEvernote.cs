@@ -5,7 +5,6 @@ using System.Web;
 using System.Net;
 using System.IO;
 using System.Collections.Specialized;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 
 namespace EvernoteOAuthNet
@@ -361,26 +360,13 @@ namespace EvernoteOAuthNet
         /// <returns>The response data.</returns>
         public string WebResponseGet(HttpWebRequest webRequest)
         {
-            StreamReader responseReader = null;
-            string responseData = "";
-
-            try
+            using (Stream responseStream = webRequest.GetResponse().GetResponseStream())
             {
-                responseReader = new StreamReader(webRequest.GetResponse().GetResponseStream());
-                responseData = responseReader.ReadToEnd();
+                using (StreamReader responseReader = new StreamReader(responseStream))
+                {
+                    return responseReader.ReadToEnd();
+                }
             }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                webRequest.GetResponse().GetResponseStream().Close();
-                responseReader.Close();
-                responseReader = null;
-            }
-
-            return responseData;
         }
     }
 }
